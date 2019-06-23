@@ -10,7 +10,6 @@ The following Arduino libraries, which are not distributed with the IDE, are req
 - mcp_can - Canbus library
 - INA226 - Library for current / voltage sensing chip
 - EEPROMAnything - Provides a user friendly way to store structures to EEPROM
-- AltSoftSerial - Efficiently provides an extra serial port
 - DS2480B - Interfaces with DS2480B serial to 1-wire chip
 - DallasTemperature - Provides support for 1-wire temperature sensors
 - FrequencyTimer2 - Provides support for steady timer interrupts on the AVR processor
@@ -24,6 +23,7 @@ The canbus is supposed to be terminated on both ends of the bus. The JLD505 boar
 can be used by soldering the jumpers near the center of the board.
 
 
+Modified by Isaac Kelly; uses DS18B20 sensors without DS2480b chip since that's SMD only; adds CAN BMS interface, more logging, more configurable settings. 2019
 
 
 
