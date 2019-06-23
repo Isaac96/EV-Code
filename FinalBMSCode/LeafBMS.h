@@ -11,7 +11,7 @@ class LeafBMS : public CANListener {
   public:
 
     void getGroup(int group);//requests data from BMS
-    
+
     void printFrame(CAN_message_t &frame, int mailbox);//debug function which spits out frames to the serial port
     void gotFrame(CAN_message_t &frame, int mailbox); //overrides the parent version so we can actually do something
 
@@ -21,7 +21,7 @@ class LeafBMS : public CANListener {
     void parseSOCFrame(CAN_message_t &frame);//interprets pack info frames
     void parseVFrame(CAN_message_t &frame);//interprets pack info frames
 
-    void sendBMSData();//sends data to GEVCU w/ID 0x50f
+    void sendBMSData();//sends data to EVCC w/ID 0x50e
 
     byte tempData[4];//data from BMS, which is also the actual temperatures
     byte cellData[200];//raw cell data from BMS
@@ -30,6 +30,10 @@ class LeafBMS : public CANListener {
     uint16_t vHighestVolt;//highest cell voltage
     int highestCell;
     uint16_t lowestVolt;//lowest cell voltage
+    uint32_t smoothLowestVolt;//smoother value
+    uint16_t lowestVoltArray[10];//array for moving average
+    int movingIndex = 0;
+    int runs = 0;
     uint16_t vLowestVolt;//lowest cell voltage
     int lowestCell;
     int cellDiff;//difference between highest and lowest cells
@@ -47,30 +51,33 @@ class LeafBMS : public CANListener {
     bool gotHalfCellFrame = 0;
     bool gotSOCFrame = 0;
     bool gotVFrame = 0;
+    bool firstRun = false;
 
     bool isConnected = false;//whether there has been data recently
     bool HVC = false;
     bool LVC = false;
+    bool BVC = false;
     bool allowCharge = false;
     bool allowDischarge = false;
 
-    long tempTimer;//counters for data retrieval timing
-    long vTimer;
-    long cellTimer;
-    long SOCTimer;
-    long debugTimer;
-    long EVCCTimer;
-    long heartbeat;//the time since the last cell data; makes sure wires stay connected
-    long SOCInterval = 3000;
-    long cellInterval = 3000;
-    long vInterval = 3000;
-    long tempInterval = 10000;
-    long debugInterval = 1000;
-    long heartbeatInterval = 10000;
-    long EVCCInterval = 500;
+    unsigned long tempTimer;//counters for data retrieval timing
+    unsigned long vTimer;
+    unsigned long cellTimer;
+    unsigned long SOCTimer;
+    unsigned long debugTimer;
+    unsigned long EVCCTimer;
+    unsigned long heartbeat;//the time since the last cell data; makes sure wires stay connected
+    unsigned long SOCInterval = 3000;
+    unsigned long cellInterval = 3000;
+    unsigned long vInterval = 3000;
+    unsigned long tempInterval = 10000;
+    unsigned long debugInterval = 1000;
+    unsigned long heartbeatInterval = 10000;
+    unsigned long EVCCInterval = 500;
 
     int maxCellVoltage = 4200;//configure the max and min voltages you wish
     int minCellVoltage = 3300;
+    int balanceCellVoltage = 4150;
 };
 
 #endif

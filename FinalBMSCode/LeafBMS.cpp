@@ -17,6 +17,9 @@ void LeafBMS::sendBMSData() {
   if (LVC) {
     bitSet(EVCCFrame.buf[0], 1);
   }
+  if (BVC) {
+    bitSet(EVCCFrame.buf[0], 2);
+  }
   //if (!isConnected) {
   //bitSet(EVCCFrame.buf[2], 2);//therm overtemp
   //}
@@ -26,7 +29,7 @@ void LeafBMS::sendBMSData() {
   infoFrame.ext = 0;
   infoFrame.id = 0x50e;
   infoFrame.len = 8;
-  infoFrame.buf[0] = 0x00;//status; 1 = hvc, 2 = lvc
+  infoFrame.buf[0] = 0x00;//status; 1 = hvc, 2 = lvc, 4 = bvc
   infoFrame.buf[1] = 0x00;//fault; 1 = overtemp/undertemp
   infoFrame.buf[2] = lowByte(totalVoltage);//voltage LSB
   infoFrame.buf[3] = highByte(totalVoltage);//voltage MSB
@@ -40,6 +43,9 @@ void LeafBMS::sendBMSData() {
   }
   if (LVC) {
     bitSet(infoFrame.buf[0], 1);
+  }
+  if (BVC) {
+    bitSet(infoFrame.buf[0], 2);
   }
 
   Can0.write(EVCCFrame);
@@ -168,6 +174,30 @@ void LeafBMS::parseCellFrame(CAN_message_t &frame) {
       else {}
       cellDiff = highestVolt - lowestVolt;//figure out the total difference; this is a good measure of pack health
     }
+    if (lowestVolt > 0) {
+      runs++;
+      if (runs > 10) {
+        runs = 10;
+      }
+      movingIndex++;
+      if (movingIndex >= 10) {
+        movingIndex = 0;
+      }
+      lowestVoltArray[movingIndex] = lowestVolt;
+      for (int i = 0; i < 9; i++) {
+        smoothLowestVolt += lowestVoltArray[i];
+      }
+      //Serial.println(lowestVolt);
+      //Serial.println(smoothLowestVolt);
+      if (runs == 10) {
+        smoothLowestVolt = smoothLowestVolt / 10;
+        //Serial.println("Using real smooth values");
+      } else {
+        smoothLowestVolt = lowestVolt;
+      }
+      //Serial.println(smoothLowestVolt);
+      //Serial.println(movingIndex);
+    }
     cellTimer = millis();//we got a full group, reset the counter
     heartbeat = millis();
     isConnected = true;
@@ -192,10 +222,10 @@ void LeafBMS::parseVFrame(CAN_message_t &frame) {
     gotVFrame = 0;
     vLowestVolt = vData[13] + (vData[12] * 256);
     vHighestVolt = vData[11] + (vData[10] * 256);
-    Serial.print("Lowest Volt: ");
-    Serial.println(vLowestVolt);
-    Serial.print("Highest Volt: ");
-    Serial.println(vHighestVolt);
+    //Serial.print("Lowest Volt: ");
+    //Serial.println(vLowestVolt);
+    //Serial.print("Highest Volt: ");
+    //Serial.println(vHighestVolt);
     vCellDiff = vHighestVolt - vLowestVolt;
     vTimer = millis();
 
