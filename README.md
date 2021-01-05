@@ -1,5 +1,5 @@
 # EV-Code
-Arduino projects for the Boxster - [url]electricboxster.com[/url]
+Arduino projects for the Boxster - http://www.electricboxster.com
 
 LLTBMS07 runs 12 BMS modules on the Pacifica batteries, using multiplexers and isolators for safety.
 
