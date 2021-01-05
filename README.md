@@ -1,5 +1,7 @@
 # EV-Code
-Arduino projects for the Boxster
+Arduino projects for the Boxster - [url]electricboxster.com[/url]
+
+LLTBMS07 runs 12 BMS modules on the Pacifica batteries, using multiplexers and isolators for safety.
 
 JLD505 is a clone of the EVTV board of the same name; the code is available but in an old version. Handles coulomb counting using INA226 and CHAdeMO with MCP2515 and optoisolators. Includes temperature sensors. Will run ammeter, voltmeter, and temperature gauges eventually.
 
